@@ -75,7 +75,20 @@ Oops::Tasks.new do
 end
 
 namespace :oops do
-  task :upload, :filename do |t, args|
+  task :setup_aws do
+    config_file = File.expand_path("~/.aws/config")
+    if File.exist?(config_file)
+      puts "loading credentation from #{config_file}"
+      config = ParseConfig.new(config_file)
+      AWS.config(
+        region: config['default']['region'],
+        access_key_id: config['default']['aws_access_key_id'],
+        secret_access_key: config['default']['aws_secret_access_key'])
+    end
+  end
+
+  desc "upload built archive"
+  task :upload, [:filename] => :setup_aws do |t, args|
     args.with_defaults filename: default_filename
 
     file_path = args.filename
@@ -86,19 +99,19 @@ namespace :oops do
     puts "Uploaded Application: #{s3.url_for(:read)}"
   end
 
-  task :deploy, :app_name, :stack_name, :filename do |t, args|
+  desc "deploy uploaded archive"
+  task :deploy, [:app_name, :stack_name, :filename] => :setup_aws do |t, args|
     raise "app_name variable is required" unless (app_name = args.app_name)
     raise "stack_name variable is required" unless (stack_name = args.stack_name)
     args.with_defaults filename: default_filename
     file_path = args.filename
     file_url = s3_url file_path
 
-    ENV['AWS_REGION'] = 'us-east-1'
-
     if !s3_object(file_path).exists?
       raise "Artifact \"#{file_url}\" doesn't seem to exist\nMake sure you've run `RAILS_ENV=deploy rake opsworks:build opsworks:upload` before deploying"
     end
 
+    AWS.config(region: 'us-east-1')
     ops = Oops::OpsworksDeploy.new args.app_name, args.stack_name
     deployment = ops.deploy(file_url)
 
