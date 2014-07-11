@@ -108,8 +108,8 @@ namespace :oops do
 
   desc "deploy uploaded archive"
   task :deploy, [:app_name, :stack_name, :filename] => :setup_aws do |t, args|
-    raise "app_name variable is required" unless (app_name = args.app_name)
-    raise "stack_name variable is required" unless (stack_name = args.stack_name)
+    abort "app_name variable is required" unless (app_name = args.app_name)
+    abort "stack_name variable is required" unless (stack_name = args.stack_name)
     args.with_defaults filename: default_filename
     file_path = args.filename
     file_url = s3_url file_path
@@ -117,7 +117,7 @@ namespace :oops do
     ENV['AWS_REGION'] ||= 'us-east-1'
 
     if !s3_object(file_path).exists?
-      raise "Artifact \"#{file_url}\" doesn't seem to exist\nMake sure you've run `RAILS_ENV=deploy rake opsworks:build opsworks:upload` before deploying"
+      abort "Artifact \"#{file_url}\" doesn't seem to exist\nMake sure you've run `RAILS_ENV=deploy rake opsworks:build opsworks:upload` before deploying"
     end
 
     AWS.config(region: 'us-east-1')
@@ -133,7 +133,7 @@ namespace :oops do
     end
 
     STDOUT.puts "\nStatus: #{deployment.status}"
-    raise "Deploy failed. Check the OpsWorks console." if deployment.failed?
+    abort "Deploy failed. Check the OpsWorks console." if deployment.failed?
   end
 
   private
@@ -155,12 +155,12 @@ namespace :oops do
   end
 
   def package_folder
-    raise "PACKAGE_FOLDER environment variable required" unless ENV['PACKAGE_FOLDER']
+    abort "PACKAGE_FOLDER environment variable required" unless ENV['PACKAGE_FOLDER']
     ENV['PACKAGE_FOLDER']
   end
 
   def bucket_name
-    raise "DEPLOY_BUCKET environment variable required" unless ENV['DEPLOY_BUCKET']
+    abort "DEPLOY_BUCKET environment variable required" unless ENV['DEPLOY_BUCKET']
     ENV['DEPLOY_BUCKET']
   end
 
