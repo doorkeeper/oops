@@ -8,7 +8,7 @@ module Oops
 
     def self.default_args
       {
-        prerequisites: ['assets:clean', 'assets:precompile'],
+        prerequisites: ['oops:compile'],
         additional_paths: [],
         includes: ['public/assets', 'public/packs'],
         excludes: ['.gitignore'],
@@ -75,6 +75,13 @@ Oops::Tasks.new do
 end
 
 namespace :oops do
+
+  task :compile do
+    puts "starting asset compilation"
+    `RAILS_ENV=production bundle exec rake assets:clean assets:precompile`
+    abort "asset compitation error" if $? != 0
+  end
+
   task :setup_aws do
     config_file = File.expand_path("~/.aws/config")
     if File.exist?(config_file)
