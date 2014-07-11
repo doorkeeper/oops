@@ -85,7 +85,7 @@ namespace :oops do
   task :setup_aws do
     config_file = File.expand_path("~/.aws/config")
     if File.exist?(config_file)
-      puts "loading credentation from #{config_file}"
+      puts "loading credentials from #{config_file}"
       config = ParseConfig.new(config_file)
       AWS.config(
         region: config['default']['region'],
