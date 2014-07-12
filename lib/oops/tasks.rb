@@ -125,7 +125,7 @@ namespace :oops do
     deployment = ops.deploy(file_url)
 
     STDOUT.sync = true
-    STDOUT.print "Deploying"
+    STDOUT.print "Deploying #{build_hash[0..7]} "
     loop do
       STDOUT.print "."
       break if deployment.finished?
