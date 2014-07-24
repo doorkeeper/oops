@@ -134,7 +134,22 @@ namespace :oops do
     end
 
     STDOUT.puts "\nStatus: #{deployment.status}"
-    abort "Deploy failed. Check the OpsWorks console." if deployment.failed?
+    if deployment.failed?
+      Rake::Task['oops:deploy_failed'].invoke
+      abort "Deploy failed. Check the OpsWorks console."
+    else
+      Rake::Task['oops:deploy_finished'].invoke
+    end
+  end
+
+  task :deploy_start do
+    # hook
+  end
+  task :deploy_failed do
+    # hook
+  end
+  task :deploy_finished do
+    # hook
   end
 
   private
