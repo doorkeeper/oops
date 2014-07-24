@@ -120,6 +120,8 @@ namespace :oops do
       abort "Artifact \"#{file_url}\" doesn't seem to exist\nMake sure you've run `RAILS_ENV=deploy rake opsworks:build opsworks:upload` before deploying"
     end
 
+    Rake::Task['oops:deploy_start'].invoke
+
     AWS.config(region: 'us-east-1')
     ops = Oops::OpsworksDeploy.new args.app_name, args.stack_name
     deployment = ops.deploy(file_url)
@@ -133,7 +135,22 @@ namespace :oops do
     end
 
     STDOUT.puts "\nStatus: #{deployment.status}"
-    abort "Deploy failed. Check the OpsWorks console." if deployment.failed?
+    if deployment.failed?
+      Rake::Task['oops:deploy_failed'].invoke
+      abort "Deploy failed. Check the OpsWorks console."
+    else
+      Rake::Task['oops:deploy_finished'].invoke
+    end
+  end
+
+  task :deploy_start do
+    # hook
+  end
+  task :deploy_failed do
+    # hook
+  end
+  task :deploy_finished do
+    # hook
   end
 
   private
