@@ -52,6 +52,33 @@ Actions needed for oops to run are:
 * opsworks:DescribeInstances
 * opsworks:CreateDeployment
 
+## Deploy Hooks
+
+For notifcations and other things there are deploy hooks. For notifications to hipchat for instance create a `lib/tasks/oops-extensions.rake` file in your project with the following content:
+
+```
+namespace :oops do
+  task :notify_hipchat_start do
+    hipchat_room.send('OOPS', "Starting deploy #{build_hash[0..7]}")
+  end
+  task :notify_hipchat_failed do
+    hipchat_room.send('OOPS', "Deploy #{build_hash[0..7]} failed", :color => 'red')
+  end
+  task :notify_hipchat_finished do
+    hipchat_room.send('OOPS', "Deploy #{build_hash[0..7]} completed", :color => 'green')
+  end
+  task :deploy_start => :notify_hipchat_start
+  task :deploy_failed => :notify_hipchat_failed
+  task :deploy_finished => :notify_hipchat_finished
+
+  def hipchat_room
+    @hipchat_room ||= HipChat::Client.new(<your-api-key>)[<your-room-name>]
+  end
+end
+```
+
+Make sure to replace `<your-api-key>` and `<your-room-name>`.
+
 ## Contributing
 
 1. Fork it
