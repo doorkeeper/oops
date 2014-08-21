@@ -110,6 +110,7 @@ namespace :oops do
   task :deploy, [:app_name, :stack_name, :filename] => :setup_aws do |t, args|
     abort "app_name variable is required" unless (app_name = args.app_name)
     abort "stack_name variable is required" unless (stack_name = args.stack_name)
+    make_sure_git_is_up_to_date
     args.with_defaults filename: default_filename
     file_path = args.filename
     file_url = s3_url file_path
@@ -158,6 +159,15 @@ namespace :oops do
 
   def s3_url file_path
     s3_object(file_path).public_url.to_s
+  end
+
+  def make_sure_git_is_up_to_date
+    gitout = `git fetch origin --dry-run 2>&1`
+    unless gitout.blank?
+      abort "git repositry not up to date, git pull first!"
+    else
+      puts "git ok"
+    end
   end
 
   def build_hash
