@@ -26,6 +26,7 @@ To create a build:
     ```
     AWS_ACCESS_KEY_ID=MY_ACCESS_KEY AWS_SECRET_ACCESS_KEY=MY_SECRET_KEY DEPLOY_BUCKET=oops-deploy PACKAGE_FOLDER=opsbuilds bundle exec rake oops:build
     ```
+You can set ASSET_ENV in case you need to compile assets for a different environment than production (for instance if you're compiling assets for your staging environment).
 
 To upload a build:
     ```
