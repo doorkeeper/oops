@@ -77,8 +77,9 @@ end
 namespace :oops do
 
   task :compile do
-    puts "starting asset compilation"
-    `RAILS_ENV=production bundle exec rake assets:clean assets:precompile`
+    rails_env_for_assets = ENV['ASSET_ENV'] || "production"
+    puts "starting asset compilation (#{rails_env_for_assets})"
+    `RAILS_ENV=#{rails_env_for_assets} bundle exec rake assets:clean assets:precompile`
     abort "asset compitation error" if $? != 0
   end
 
