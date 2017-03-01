@@ -88,7 +88,7 @@ namespace :oops do
     if File.exist?(config_file)
       puts "loading credentials from #{config_file}"
       config = ParseConfig.new(config_file)
-      AWS.config(
+      Aws.config.update(
         region: config['default']['region'],
         access_key_id: config['default']['aws_access_key_id'],
         secret_access_key: config['default']['aws_secret_access_key'])
@@ -124,7 +124,6 @@ namespace :oops do
 
     Rake::Task['oops:deploy_start'].invoke
 
-    AWS.config(region: 'us-east-1')
     ops = Oops::OpsworksDeploy.new args.app_name, args.stack_name
     deployment = ops.deploy(file_url)
 
