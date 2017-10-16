@@ -88,10 +88,11 @@ namespace :oops do
     if File.exist?(config_file)
       puts "loading credentials from #{config_file}"
       config = ParseConfig.new(config_file)
-      AWS.config(
+      Aws.config = {
         region: config['default']['region'],
         access_key_id: config['default']['aws_access_key_id'],
-        secret_access_key: config['default']['aws_secret_access_key'])
+        secret_access_key: config['default']['aws_secret_access_key']
+      }
     end
   end
 
